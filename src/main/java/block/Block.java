@@ -35,11 +35,14 @@ public class Block {
             sb.append('0');
         }
 
+        System.out.println("Mining....");
         String target = sb.toString();
         while (!hash.substring(0, difficulty).equals(target)) {
             this.nonce++;
             setHash();
         }
+
+        System.out.println("Found a new block!");
     }
 
     public String getHash() {

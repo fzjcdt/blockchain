@@ -37,7 +37,6 @@ public class RocksDBUtil {
     private void openDB() {
         try {
             db = RocksDB.open(DB_FILE);
-
         } catch (RocksDBException e) {
             throw new RuntimeException("Fail to open rocks db", e);
         }
@@ -48,9 +47,11 @@ public class RocksDBUtil {
             byte[] blockBucketKey = SerializeUtil.serialize(BLOCKS_BUCKET_KEY);
             byte[] blockBucketBytes = db.get(blockBucketKey);
             if (blockBucketBytes != null) {
-                blocksBucket = new HashMap<String, byte[]>();
+                blocksBucket = (Map) SerializeUtil.deserialize(blockBucketBytes);
+            } else {
+                blocksBucket = new HashMap();
+                db.put(blockBucketKey, SerializeUtil.serialize(blocksBucket));
             }
-
         } catch (RocksDBException e) {
             throw new RuntimeException("Fail to init block bucket", e);
         }
@@ -60,7 +61,7 @@ public class RocksDBUtil {
         try {
             blocksBucket.put(LAST_BLOCK_KEY, SerializeUtil.serialize(tipBlockHash));
             db.put(SerializeUtil.serialize(BLOCKS_BUCKET_KEY), SerializeUtil.serialize(blocksBucket));
-        } catch (RocksDBException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Fail to put last block hash", e);
         }
     }
@@ -74,7 +75,6 @@ public class RocksDBUtil {
         try {
             blocksBucket.put(block.getHash(), SerializeUtil.serialize(block));
             db.put(SerializeUtil.serialize(BLOCKS_BUCKET_KEY), SerializeUtil.serialize(blocksBucket));
-
         } catch (RocksDBException e) {
             throw new RuntimeException("Fail to put block", e);
         }
@@ -91,5 +91,4 @@ public class RocksDBUtil {
             throw new RuntimeException("Fail to close db", e);
         }
     }
-
 }
