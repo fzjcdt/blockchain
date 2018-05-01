@@ -1,13 +1,23 @@
 package block;
 
-public class BlockChain {
-    public static void main(String[] args) {
-        Block b1 = new Block("", "first block");
-        Block b2 = new Block(b1.getHash(), "second block");
-        Block b3 = new Block(b2.getHash(), "first block");
+import com.google.gson.GsonBuilder;
 
-        System.out.println(b1.getHash());
-        System.out.println(b2.getHash());
-        System.out.println(b3.getHash());
+import java.util.ArrayList;
+import java.util.List;
+
+public class BlockChain {
+    public static List<Block> blockchain = new ArrayList<Block>();
+    public static int difficulty = 4;
+
+    public static void main(String[] args) {
+        blockchain.add(new Block("", "first block"));
+        blockchain.get(blockchain.size() - 1).mineBlock(difficulty);
+        blockchain.add(new Block(blockchain.get(blockchain.size() - 1).getHash(), "second block"));
+        blockchain.get(blockchain.size() - 1).mineBlock(difficulty);
+        blockchain.add(new Block(blockchain.get(blockchain.size() - 1).getHash(), "third block"));
+        blockchain.get(blockchain.size() - 1).mineBlock(difficulty);
+
+        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
+        System.out.println(blockchainJson);
     }
 }

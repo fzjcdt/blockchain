@@ -9,6 +9,7 @@ public class Block {
     private String prevHash;
     private String data;
     private long timeStamp;
+    private long nonce = 0;
 
     public Block(String prevHash, String data) {
         setPrevHash(prevHash);
@@ -21,10 +22,24 @@ public class Block {
         String hash = Sha256Util.sha256Encryption(
                 prevHash +
                         Long.toString(timeStamp) +
+                        Long.toString(nonce) +
                         data
         );
 
         return hash;
+    }
+
+    public void mineBlock(int difficulty) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < difficulty; i++) {
+            sb.append('0');
+        }
+
+        String target = sb.toString();
+        while (!hash.substring(0, difficulty).equals(target)) {
+            this.nonce++;
+            setHash();
+        }
     }
 
     public String getHash() {
