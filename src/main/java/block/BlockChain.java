@@ -1,35 +1,30 @@
 package block;
 
-import store.RocksDBUtil;
 import util.JsonUtil;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BlockChain {
-    public static int difficulty = 4;
-    private static String lastBlockHash = "";
+    public List<Block> blockChain;
 
-    public void addBlock(String data) throws Exception {
-        addBlock(new Block(lastBlockHash, data));
+    private BlockChain() {
+        blockChain = new ArrayList<Block>();
+        blockChain.add(Block.genesisBlock());
     }
 
-    public void addBlock(Block block) throws Exception {
-        block.mineBlock(difficulty);
-        RocksDBUtil.getInstance().putLastBlockHash(block.getHash());
-        RocksDBUtil.getInstance().putBlock(block);
-        lastBlockHash = block.getHash();
-        System.out.println(JsonUtil.toJson(block));
+    public static BlockChain newBlockChain() {
+        return new BlockChain();
     }
 
-    public static void main(String[] args) {
-        BlockChain blockChain = new BlockChain();
-        try {
-            blockChain.addBlock("first block");
-            System.out.println(RocksDBUtil.getInstance().getLastBlockHash());
-            blockChain.addBlock("second block");
-            System.out.println(RocksDBUtil.getInstance().getLastBlockHash());
-            blockChain.addBlock("third block");
-            System.out.println(RocksDBUtil.getInstance().getLastBlockHash());
-        } catch (Exception e) {
-            System.err.println(e);
+    public void addBlock(String data) {
+        String prevHash = blockChain.get(blockChain.size() - 1).getHash();
+        blockChain.add(Block.generateNewBlock(prevHash, data));
+    }
+
+    public void printBlock() {
+        for (Block block : blockChain) {
+            System.out.println(JsonUtil.toJson(block));
         }
     }
 }
