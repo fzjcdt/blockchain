@@ -12,6 +12,9 @@ public class Block {
     private long timeStamp;
     private long nonce = 0;
 
+    public Block() {
+    }
+
     public Block(String hash, String prevHash, String data, long timeStamp, long nonce) {
         this.hash = hash;
         this.prevHash = prevHash;

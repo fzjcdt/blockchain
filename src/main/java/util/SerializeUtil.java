@@ -1,5 +1,6 @@
 package util;
 
+import block.Block;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -21,5 +22,15 @@ public class SerializeUtil {
         output.close();
 
         return bytes;
+    }
+
+    public static void main(String[] args) {
+        Block block = Block.generateNewBlock("", "test");
+        System.out.println(JsonUtil.toJson(block));
+        byte[] by = serialize(block);
+        Object obj = deserialize(by);
+        System.out.println(obj instanceof Block);
+        Block temp = (Block) deserialize(by);
+        System.out.println(JsonUtil.toJson(block));
     }
 }
