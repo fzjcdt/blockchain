@@ -19,7 +19,7 @@ public class ProofOfWork {
         return new ProofOfWork(block);
     }
 
-    private String generateTarget() {
+    public static String generateTarget() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < difficulty; i++) {
             sb.append('0');

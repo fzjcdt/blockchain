@@ -2,6 +2,7 @@ package block;
 
 import pow.ProofOfWork;
 import pow.ValidRst;
+import util.Sha256Util;
 
 import java.util.Date;
 
@@ -35,6 +36,17 @@ public class Block {
         block.setNonce(validRst.getNonce());
 
         return block;
+    }
+
+    public boolean verifyHash() {
+        String realHash = Sha256Util.sha256Encryption(
+                this.getPrevHash() +
+                        Long.toString(this.getTimeStamp()) +
+                        this.getData() +
+                        Long.toString(this.nonce)
+        );
+
+        return realHash.equals(this.getHash());
     }
 
     public String getHash() {
