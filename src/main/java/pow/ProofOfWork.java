@@ -4,7 +4,7 @@ import block.Block;
 import util.Sha256Util;
 
 public class ProofOfWork {
-    private static int difficulty = 4;
+    private static int difficulty = 3;
     private String target;
     private long nonce;
     private Block block;

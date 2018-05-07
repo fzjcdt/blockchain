@@ -2,6 +2,7 @@ package test;
 
 import block.BlockChain;
 import network.P2P;
+import view.MainView;
 
 import java.util.Scanner;
 
@@ -37,6 +38,8 @@ public class BlockChainTest {
                 case 1:
                     blockChain.printBlock();
                     break;
+                case 2:
+                    new MainView().init();
             }
         }
     }
