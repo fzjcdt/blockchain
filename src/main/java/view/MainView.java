@@ -6,6 +6,7 @@ import controller.MainController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 import util.JsonUtil;
+import wallet.Wallet;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -212,7 +213,8 @@ public class MainView {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        MyDialog.showMessageDialog("DDELN3JLN23", JOptionPane.PLAIN_MESSAGE,
+                        Wallet w = new Wallet();
+                        MyDialog.showMessageDialog(w.getPrivateKey(), JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_OPTION, "", 500, 180);
                     }
                 }
