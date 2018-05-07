@@ -17,7 +17,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MainView {
-    JFrame mainFrame = new JFrame("");
+    public static JFrame mainFrame = null;
     static DefaultTableModel blockModel;
     static JTable blockTable;
     static JPopupMenu popupMenu;
@@ -35,6 +35,7 @@ public class MainView {
             //TODO exception
         }
 
+        mainFrame = new JFrame("");
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setJMenuBar(getMainMenuBar());
         mainFrame.add(getMainTablePane());
@@ -72,7 +73,7 @@ public class MainView {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        MyDialog.showMessageDialog(JsonUtil.toJson(BlockChain.blockChain.get(RowNum - 1)),
+                        MyDialog.showMessageDialog(JsonUtil.toJson(BlockChain.blockChain.get(RowNum)),
                                 JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_OPTION, "", 600, 240);
                     }
@@ -163,7 +164,6 @@ public class MainView {
         return panel;
     }
 
-
     private JTabbedPane getMainTablePane() {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setFont(new Font("Monospaced", Font.PLAIN, 15));
@@ -171,19 +171,36 @@ public class MainView {
         tabbedPane.addTab("Block", null, getBlockPanel(), "Block information");
         tabbedPane.addTab(" Ip  ", null, getIpPanel(), "IP maliciousness");
         tabbedPane.addTab("User ", null, getUserPanel(), "User's ranking");
-        tabbedPane.addTab("Mine ", null, getMinePanel(), "Panel for mining");
+        tabbedPane.addTab("Mining", null, getMinePanel(), "Panel for mining");
 
         return tabbedPane;
     }
 
-    private JMenu getMenu() {
-        JMenu menu = new JMenu("Option");
+    private JMenu getLoginMenu() {
+        JMenu menu = new JMenu("Login");
         menu.setFont(new Font("Monospaced", Font.BOLD, 14));
 
         menu.add(getRegisterMenuItem());
         menu.add(getLoginMenuItem());
+
+        return menu;
+    }
+
+    private JMenu getUpdateMenu() {
+        JMenu menu = new JMenu("Update");
+        menu.setFont(new Font("Monospaced", Font.BOLD, 14));
+
         menu.add(getJoinBLockChainMenuItem());
         menu.add(getupdateMenuItem());
+
+        return menu;
+    }
+
+    private JMenu getMiningMenu() {
+        JMenu menu = new JMenu("Mine");
+        menu.setFont(new Font("Monospaced", Font.BOLD, 14));
+
+        menu.add(getMiningMenuItem());
 
         return menu;
     }
@@ -211,8 +228,9 @@ public class MainView {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        MyDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
+                        Object pubKey = MyDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
+                        mainFrame.setTitle(pubKey.toString());
                     }
                 }
         );
@@ -237,7 +255,7 @@ public class MainView {
     }
 
     private JMenuItem getupdateMenuItem() {
-        JMenuItem updateItem = new JMenuItem("Update");
+        JMenuItem updateItem = new JMenuItem("Reload");
         updateItem.setFont(new Font("Monospaced", Font.BOLD, 12));
         updateItem.addActionListener(
                 new ActionListener() {
@@ -252,9 +270,29 @@ public class MainView {
         return updateItem;
     }
 
+    private JMenuItem getMiningMenuItem() {
+        JMenuItem miningItem = new JMenuItem("Mining");
+        miningItem.setFont(new Font("Monospaced", Font.BOLD, 12));
+        miningItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Object data = MyDialog.showInputDialog("Input the data:", JOptionPane.PLAIN_MESSAGE,
+                                JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
+                        MainController.mining(data.toString());
+                        JProgressBar.generateProgressBar(5, "Mining...");
+                    }
+                }
+        );
+
+        return miningItem;
+    }
+
     public JMenuBar getMainMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        menuBar.add(getMenu());
+        menuBar.add(getLoginMenu());
+        menuBar.add(getUpdateMenu());
+        menuBar.add(getMiningMenu());
 
         return menuBar;
     }

@@ -1,5 +1,6 @@
 package block;
 
+import controller.MainController;
 import network.P2P;
 import pow.ProofOfWork;
 import util.JsonUtil;
@@ -23,6 +24,7 @@ public class BlockChain {
     public static void receiveBlockChainHandle(List<Block> bc) {
         if (bc.size() >= blockChain.size() && isValidBlockChain(bc)) {
             blockChain = bc;
+            MainController.notifyUpdateBlockChain();
         }
     }
 
@@ -79,16 +81,18 @@ public class BlockChain {
         P2P.getInstance().dispatchToALL("give me the blockchain");
     }
 
-    public void addBlock(String data) {
+    public static void addBlock(String data) {
         String prevHash = blockChain.get(blockChain.size() - 1).getHash();
         Block newBlock = Block.generateNewBlock(prevHash, data);
         blockChain.add(newBlock);
+        MainController.notifyAddBlock(newBlock);
         P2P.getInstance().dispatchToALL(newBlock);
     }
 
     public static void addBlock(Block block) {
         if (isValidBlock(block)) {
             blockChain.add(block);
+            MainController.notifyAddBlock(block);
         }
     }
 
