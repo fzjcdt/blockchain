@@ -13,7 +13,7 @@ public class BlockChain {
     private BlockChain() {
         blockChain = new ArrayList<Block>();
         blockChain.add(Block.genesisBlock());
-        updataBlockChainFromOtherNodes();
+        //updataBlockChainFromOtherNodes();
     }
 
     public static BlockChain newBlockChain() {

@@ -20,6 +20,7 @@ public class BlockChainTest {
 
     public static void main(String[] args) {
         BlockChain blockChain = BlockChain.newBlockChain();
+        BlockChain.updataBlockChainFromOtherNodes();
         int type = 0;
         String data = "";
         P2P.getInstance();

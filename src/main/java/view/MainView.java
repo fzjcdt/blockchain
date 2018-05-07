@@ -2,9 +2,10 @@ package view;
 
 import block.Block;
 import block.BlockChain;
+import controller.MainController;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
-import org.jb2011.lnf.beautyeye.ch3_button.BEButtonUI;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
+import util.JsonUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -12,11 +13,15 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class MainView {
     JFrame mainFrame = new JFrame("");
-    DefaultTableModel blockModel;
-    JTable blockTable;
+    static DefaultTableModel blockModel;
+    static JTable blockTable;
+    static JPopupMenu popupMenu;
+    static int RowNum = 0;
     private static final int BLOCK_COLUMN = 5;
 
     public void init() {
@@ -29,48 +34,84 @@ public class MainView {
         } catch (Exception e) {
             //TODO exception
         }
+
         mainFrame.setLayout(new BorderLayout());
         mainFrame.setJMenuBar(getMainMenuBar());
         mainFrame.add(getMainTablePane());
-        JButton b = new JButton("update");
-        b.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));
-        //mainFrame.add(b, BorderLayout.SOUTH);
 
         mainFrame.setSize(1400, 800);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
     }
 
-    private void setBlockModel() {
+    private static void setBlockModel() {
         String[] headerNames = {"prevHash", "hash", "data", "nonce", "timeStamp"};
+        if (BlockChain.blockChain == null) {
+            blockModel = new DefaultTableModel(headerNames, 0);
+            return;
+        }
+
         blockModel = new DefaultTableModel(headerNames, BlockChain.blockChain.size());
 
-        /*
-        List<Block> blockChain = new ArrayList<Block>();
-        blockChain.add(Block.genesisBlock());
-        blockChain.add(Block.genesisBlock());
-        blockChain.add(Block.genesisBlock());
-        blockChain.add(Block.genesisBlock());
-        blockChain.add(Block.genesisBlock());
-
-        */
-        for (int len = BlockChain.blockChain.size() - 1, i = len; i >= 0; i--) {
+        for (int i = 0, len = BlockChain.blockChain.size(); i < len; i++) {
             Block block = BlockChain.blockChain.get(i);
 
-            blockModel.setValueAt(block.getPrevHash(), len - i, 0);
-            blockModel.setValueAt(block.getHash(), len - i, 1);
-            blockModel.setValueAt(block.getData(), len - i, 2);
-            blockModel.setValueAt(String.valueOf(block.getNonce()), len - i, 3);
-            blockModel.setValueAt(String.valueOf(block.getTimeStamp()), len - i, 4);
+            blockModel.setValueAt(block.getPrevHash(), i, 0);
+            blockModel.setValueAt(block.getHash(), i, 1);
+            blockModel.setValueAt(block.getData(), i, 2);
+            blockModel.setValueAt(String.valueOf(block.getNonce()), i, 3);
+            blockModel.setValueAt(String.valueOf(block.getTimeStamp()), i, 4);
         }
     }
 
-    private void setBlockTable() {
+    private static void createPopupMenu() {
+        popupMenu = new JPopupMenu();
+        JMenuItem menItem = new JMenuItem();
+        menItem.setText("Detail");
+        menItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        MyDialog.showMessageDialog(JsonUtil.toJson(BlockChain.blockChain.get(RowNum - 1)),
+                                JOptionPane.PLAIN_MESSAGE,
+                                JOptionPane.OK_OPTION, "", 600, 240);
+                    }
+                }
+        );
+
+        popupMenu.add(menItem);
+    }
+
+    private static void mouseRightButtonClick(MouseEvent evt) {
+        //判断是否为鼠标的BUTTON3按钮，BUTTON3为鼠标右键
+        if (evt.getButton() == MouseEvent.BUTTON3) {
+            //通过点击位置找到点击为表格中的行
+            int focusedRowIndex = blockTable.rowAtPoint(evt.getPoint());
+            if (focusedRowIndex == -1) {
+                return;
+            }
+
+            RowNum = focusedRowIndex;
+            //将表格所选项设为当前右键点击的行
+            blockTable.setRowSelectionInterval(focusedRowIndex, focusedRowIndex);
+            //弹出菜单
+            popupMenu.show(blockTable, evt.getX(), evt.getY());
+        }
+
+    }
+
+    private static void setBlockTable() {
         setBlockModel();
         blockTable = new JTable(blockModel);
         blockTable.setFont(new Font("Monospaced", Font.PLAIN, 20));
         blockTable.getTableHeader().setFont(new Font("Monospaced", Font.BOLD, 22));
         blockTable.setRowHeight(24);
+
+        blockTable.getColumnModel().getColumn(0).setPreferredWidth(240);
+        blockTable.getColumnModel().getColumn(1).setPreferredWidth(240);
+        blockTable.getColumnModel().getColumn(2).setPreferredWidth(80);
+        blockTable.getColumnModel().getColumn(3).setPreferredWidth(80);
+        blockTable.getColumnModel().getColumn(4).setPreferredWidth(80);
 
         // 数据居中
         DefaultTableCellRenderer render = new DefaultTableCellRenderer();
@@ -81,6 +122,17 @@ public class MainView {
         DefaultTableCellHeaderRenderer hr = new DefaultTableCellHeaderRenderer();
         hr.setHorizontalAlignment(JLabel.CENTER);
         blockTable.getTableHeader().setDefaultRenderer(hr);
+
+        createPopupMenu();
+        blockTable.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        //super.mouseClicked(e);
+                        mouseRightButtonClick(e);
+                    }
+                }
+        );
     }
 
     private JPanel getBlockPanel() {
@@ -121,24 +173,6 @@ public class MainView {
         tabbedPane.addTab("User ", null, getUserPanel(), "User's ranking");
         tabbedPane.addTab("Mine ", null, getMinePanel(), "Panel for mining");
 
-        /*
-        JPanel panel2 = new JPanel();
-        JButton button = new JButton("button");
-        button.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        InputDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
-                                JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
-                    }
-                }
-        );
-
-        button.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));
-        panel2.add(button);
-        tabbedPane.addTab("Tab two", null, panel2, "panel two");
-        */
-
         return tabbedPane;
     }
 
@@ -147,7 +181,9 @@ public class MainView {
         menu.setFont(new Font("Monospaced", Font.BOLD, 14));
 
         menu.add(getRegisterMenuItem());
-        menu.add(getLoginMenuIten());
+        menu.add(getLoginMenuItem());
+        menu.add(getJoinBLockChainMenuItem());
+        menu.add(getupdateMenuItem());
 
         return menu;
     }
@@ -159,7 +195,8 @@ public class MainView {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        JOptionPane.showMessageDialog(null, "wait");
+                        MyDialog.showMessageDialog("DDELN3JLN23", JOptionPane.PLAIN_MESSAGE,
+                                JOptionPane.OK_OPTION, "", 500, 180);
                     }
                 }
         );
@@ -167,20 +204,52 @@ public class MainView {
         return registerItem;
     }
 
-    private JMenuItem getLoginMenuIten() {
+    private JMenuItem getLoginMenuItem() {
         JMenuItem loginItem = new JMenuItem("Login");
         loginItem.setFont(new Font("Monospaced", Font.BOLD, 12));
         loginItem.addActionListener(
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        InputDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
+                        MyDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
                     }
                 }
         );
 
         return loginItem;
+    }
+
+    private JMenuItem getJoinBLockChainMenuItem() {
+        JMenuItem joinItem = new JMenuItem("Join chain");
+        joinItem.setFont(new Font("Monospaced", Font.BOLD, 12));
+        joinItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        MainController.updataBlockChain();
+                        JProgressBar.generateProgressBar(5, "Download blockchain...");
+                    }
+                }
+        );
+
+        return joinItem;
+    }
+
+    private JMenuItem getupdateMenuItem() {
+        JMenuItem updateItem = new JMenuItem("Update");
+        updateItem.setFont(new Font("Monospaced", Font.BOLD, 12));
+        updateItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        JProgressBar.generateProgressBar(2, "Update...");
+                        updateBlockChain();
+                    }
+                }
+        );
+
+        return updateItem;
     }
 
     public JMenuBar getMainMenuBar() {
@@ -190,51 +259,31 @@ public class MainView {
         return menuBar;
     }
 
+    public static void addTableRow(Block block) {
+        String[] newCells = new String[BLOCK_COLUMN];
 
-    public MainView() {
-        /*
-        JMenuBar menuBar = new JMenuBar();
-        this.setJMenuBar(menuBar);
-        JMenu tableMenu = new JMenu("管理");
-        menuBar.add(tableMenu);
-        JMenuItem hideColumnsItem = new JMenuItem("隐藏选中列");
-        tableMenu.add(hideColumnsItem);
+        newCells[0] = block.getPrevHash();
+        newCells[1] = block.getHash();
+        newCells[2] = block.getData();
+        newCells[3] = String.valueOf(block.getNonce());
+        newCells[4] = String.valueOf(block.getTimeStamp());
 
-        JTabbedPane tabbedPane = new JTabbedPane();
+        blockModel.addRow(newCells);
+    }
 
-        JLabel label1 = new JLabel("panel one", SwingConstants.CENTER);
-        JPanel panel1 = new JPanel();
-        panel1.add(label1);
-        tabbedPane.addTab("Tab one", null, panel1, "First Panl");
+    public static void updateBlockChain() {
+        while (blockModel.getRowCount() != 0) {
+            blockModel.removeRow(0);
+        }
 
-        JPanel panel2 = new JPanel();
-        JButton button = new JButton("button");
-        button.addActionListener(
-                new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        InputDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
-                                JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
-                    }
-                }
-        );
-
-        button.setUI(new BEButtonUI().setNormalColor(BEButtonUI.NormalColor.green));
-        panel2.add(button);
-        tabbedPane.addTab("Tab two", null, panel2, "panel two");
-
-        add(tabbedPane);
-        */
+        if (BlockChain.blockChain != null) {
+            for (Block block : BlockChain.blockChain) {
+                addTableRow(block);
+            }
+        }
     }
 
     public static void main(String[] args) {
-        /*
-        MainView frame = new MainView();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(900, 500);
-        frame.setVisible(true);
-        */
-
         new MainView().init();
     }
 }
