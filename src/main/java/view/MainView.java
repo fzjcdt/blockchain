@@ -3,6 +3,7 @@ package view;
 import block.Block;
 import block.BlockChain;
 import controller.MainController;
+import log.LogUtil;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 import util.JsonUtil;
@@ -16,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.logging.Level;
 
 public class MainView {
     public static JFrame mainFrame = null;
@@ -44,6 +46,7 @@ public class MainView {
         mainFrame.setSize(1400, 800);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
+        LogUtil.Log(Level.INFO, "Init GUI...");
     }
 
     private static void setBlockModel() {
@@ -227,6 +230,7 @@ public class MainView {
                         Wallet w = new Wallet();
                         String keyString = getKeyText(w);
                         KeyPairDialog keyPairDialog = new KeyPairDialog(keyString, 600, 300);
+                        LogUtil.Log(Level.INFO, "View: register");
                     }
                 }
         );
@@ -244,6 +248,7 @@ public class MainView {
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
                         if (pubKey != null) {
                             mainFrame.setTitle(pubKey.toString());
+                            LogUtil.Log(Level.INFO, "View: login");
                         }
                     }
                 }
@@ -261,6 +266,7 @@ public class MainView {
                     public void actionPerformed(ActionEvent e) {
                         MainController.updataBlockChain();
                         JProgressBar.generateProgressBar(5, "Download blockchain...");
+                        LogUtil.Log(Level.INFO, "View: join blockchain");
                     }
                 }
         );
@@ -293,8 +299,9 @@ public class MainView {
                     public void actionPerformed(ActionEvent e) {
                         Object data = MyDialog.showInputDialog("Input the data:", JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
-                        MainController.mining(data.toString());
                         JProgressBar.generateProgressBar(5, "Mining...");
+                        MainController.mining(data.toString());
+                        LogUtil.Log(Level.INFO, "View: mining");
                     }
                 }
         );

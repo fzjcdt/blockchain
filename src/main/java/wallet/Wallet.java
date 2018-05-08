@@ -1,15 +1,18 @@
 package wallet;
 
+import log.LogUtil;
 import util.StringUtil;
 
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
+import java.util.logging.Level;
 
 public class Wallet {
     private PrivateKey privateKey;
     private PublicKey publicKey;
 
     public Wallet() {
+        LogUtil.Log(Level.INFO, "Init a new wallet");
         generateKeyPair();
     }
 

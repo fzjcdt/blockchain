@@ -2,6 +2,7 @@ package network;
 
 import block.Block;
 import block.BlockChain;
+import log.LogUtil;
 import util.SerializeUtil;
 
 import java.io.IOException;
@@ -9,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.List;
+import java.util.logging.Level;
 
 public class P2P {
 
@@ -34,6 +36,7 @@ public class P2P {
             synchronized (P2P.class) {
                 if (instance == null) {
                     instance = new P2P();
+                    LogUtil.Log(Level.INFO, "Init P2P...");
                     instance.start();
                 }
             }
@@ -67,6 +70,7 @@ public class P2P {
         if (receiveThread.isAlive()) {
             return;
         }
+        LogUtil.Log(Level.INFO, "P2P start listening");
         receiveThread.start();
     }
 
@@ -74,6 +78,7 @@ public class P2P {
         try {
             receiveThread.interrupt();
             multiCastSocket.close();
+            LogUtil.Log(Level.INFO, "P2P stop listening");
         } catch (NullPointerException n) {
             n.printStackTrace();
         }
@@ -86,14 +91,17 @@ public class P2P {
                 Object obj = SerializeUtil.deserialize(inBuff);
                 if (obj instanceof Block) {
                     // 别的节点挖出了新节点
+                    LogUtil.Log(Level.INFO, "Receive a block");
                     BlockChain.addBlock((Block) obj);
                 } else if (obj instanceof List) {
                     // 别的节点的全链回复
+                    LogUtil.Log(Level.INFO, "Receive a blockchain check");
                     BlockChain.receiveBlockChainHandle((List<Block>) obj);
                 } else {
                     // 别的节点的整条链请求
                     // 实际上是能拿到发过来的ip的, 用socket就好, 不用多播, 但用ip是否意味着不是匿名了?
                     // 这样做会稍微加重网络负担, 之后再改进
+                    LogUtil.Log(Level.INFO, "Receive blockchain download request");
                     dispatchToALL(BlockChain.blockChain);
                 }
             } catch (IOException e) {
@@ -109,6 +117,7 @@ public class P2P {
         datagramPacket.setPort(BROADCAST_PORT);
         try {
             multiCastSocket.send(datagramPacket);
+            LogUtil.Log(Level.INFO, "P2P dispatch to other nodes");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,10 +1,12 @@
 package block;
 
+import log.LogUtil;
 import pow.ProofOfWork;
 import pow.ValidRst;
 import util.Sha256Util;
 
 import java.util.Date;
+import java.util.logging.Level;
 
 public class Block {
     private String hash;
@@ -25,6 +27,7 @@ public class Block {
     }
 
     public static Block genesisBlock() {
+        LogUtil.Log(Level.INFO, "Create genesis block");
         return generateNewBlock("", "genesisBlock");
     }
 
@@ -35,6 +38,7 @@ public class Block {
         block.setHash(validRst.getHash());
         block.setNonce(validRst.getNonce());
 
+        LogUtil.Log(Level.INFO, "Generate a new block");
         return block;
     }
 

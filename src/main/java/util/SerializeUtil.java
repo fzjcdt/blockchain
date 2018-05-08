@@ -4,6 +4,9 @@ import block.Block;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import log.LogUtil;
+
+import java.util.logging.Level;
 
 public class SerializeUtil {
 
@@ -12,6 +15,7 @@ public class SerializeUtil {
         Object rst = new Kryo().readClassAndObject(input);
         input.close();
 
+        LogUtil.Log(Level.INFO, "Deserialize");
         return rst;
     }
 
@@ -21,6 +25,7 @@ public class SerializeUtil {
         byte[] bytes = output.toBytes();
         output.close();
 
+        LogUtil.Log(Level.INFO, "Serialize");
         return bytes;
     }
 

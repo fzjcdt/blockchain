@@ -1,17 +1,20 @@
 package block;
 
 import controller.MainController;
+import log.LogUtil;
 import network.P2P;
 import pow.ProofOfWork;
 import util.JsonUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 public class BlockChain {
     public static List<Block> blockChain;
 
     private BlockChain() {
+        LogUtil.Log(Level.INFO, "Init blockchain");
         blockChain = new ArrayList<Block>();
         blockChain.add(Block.genesisBlock());
         //updataBlockChainFromOtherNodes();
@@ -23,8 +26,12 @@ public class BlockChain {
 
     public static void receiveBlockChainHandle(List<Block> bc) {
         if (bc.size() >= blockChain.size() && isValidBlockChain(bc)) {
+            LogUtil.Log(Level.INFO, "Find a valid and longer blockchain from other node");
             blockChain = bc;
+            LogUtil.Log(Level.INFO, "Updated to a valid and longer chain");
             MainController.notifyUpdateBlockChain();
+        } else {
+            LogUtil.Log(Level.INFO, "Invalid blockchain");
         }
     }
 
@@ -78,6 +85,7 @@ public class BlockChain {
 
     public static void updataBlockChainFromOtherNodes() {
         // need to improve
+        LogUtil.Log(Level.INFO, "Send download blockchain request");
         P2P.getInstance().dispatchToALL("give me the blockchain");
     }
 
@@ -85,7 +93,9 @@ public class BlockChain {
         String prevHash = blockChain.get(blockChain.size() - 1).getHash();
         Block newBlock = Block.generateNewBlock(prevHash, data);
         blockChain.add(newBlock);
+        LogUtil.Log(Level.INFO, "Found a new block\n" + JsonUtil.toJson(newBlock));
         MainController.notifyAddBlock(newBlock);
+        LogUtil.Log(Level.INFO, "Broadcast new block to other nodes");
         P2P.getInstance().dispatchToALL(newBlock);
     }
 
@@ -93,6 +103,8 @@ public class BlockChain {
         if (isValidBlock(block)) {
             blockChain.add(block);
             MainController.notifyAddBlock(block);
+            LogUtil.Log(Level.INFO, "Add a legal block discovered by other node\n"
+                    + JsonUtil.toJson(block));
         }
     }
 
