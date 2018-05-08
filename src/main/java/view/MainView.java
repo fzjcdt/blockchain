@@ -206,6 +206,17 @@ public class MainView {
         return menu;
     }
 
+    private static String getKeyText(Wallet wallet) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Public key:\n");
+        sb.append(wallet.getPublicKey());
+        sb.append("\n");
+        sb.append("Private key:\n");
+        sb.append(wallet.getPrivateKey());
+
+        return sb.toString();
+    }
+
     private JMenuItem getRegisterMenuItem() {
         JMenuItem registerItem = new JMenuItem("Register");
         registerItem.setFont(new Font("Monospaced", Font.BOLD, 12));
@@ -214,12 +225,11 @@ public class MainView {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         Wallet w = new Wallet();
-                        MyDialog.showMessageDialog(w.getPrivateKey(), JOptionPane.PLAIN_MESSAGE,
-                                JOptionPane.OK_OPTION, "", 500, 180);
+                        String keyString = getKeyText(w);
+                        KeyPairDialog keyPairDialog = new KeyPairDialog(keyString, 600, 300);
                     }
                 }
         );
-
         return registerItem;
     }
 
@@ -232,7 +242,9 @@ public class MainView {
                     public void actionPerformed(ActionEvent e) {
                         Object pubKey = MyDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
-                        mainFrame.setTitle(pubKey.toString());
+                        if (pubKey != null) {
+                            mainFrame.setTitle(pubKey.toString());
+                        }
                     }
                 }
         );

@@ -26,6 +26,7 @@ public class MyDialog {
         JDialog dialog = pane.createDialog(title);
         dialog.setSize(width, height);
         dialog.setFont(new Font("Monospaced", Font.BOLD, 20));
+
         dialog.show();
         dialog.dispose();
     }
