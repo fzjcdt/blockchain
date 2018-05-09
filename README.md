@@ -11,7 +11,7 @@ A project for blockchain learning
 ### 截图
 
 #### 界面
- ![界面](https://https://github.com/fzjcdt/blockchain/raw/master/screenshots/midterm.png)
+ ![界面](https://github.com/fzjcdt/blockchain/raw/master/screenshots/midterm.png)
 
 #### 日志
- ![日志](https://https://github.com/fzjcdt/blockchain/raw/master/screenshots/log.png)
+ ![日志](https://github.com/fzjcdt/blockchain/raw/master/screenshots/log.png)
