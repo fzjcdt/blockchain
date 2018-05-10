@@ -7,11 +7,6 @@ import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-/**
- * 自定义日志格式
- * <p>
- * Created by pos on 2016/8/31.
- */
 class MyLogFormatter extends Formatter {
 
     // Create a DateFormat to format the logger timestamp.
@@ -19,9 +14,10 @@ class MyLogFormatter extends Formatter {
 
     public String format(LogRecord record) {
         StringBuilder builder = new StringBuilder(1000);
-        builder.append(df.format(new Date(record.getMillis()))).append(" - ");
-        builder.append("[").append(record.getSourceClassName()).append(".");
-        builder.append(record.getSourceMethodName()).append("] - \n");
+        builder.append(df.format(new Date(record.getMillis())));
+        //builder.append(df.format(new Date(record.getMillis()))).append(" - ");
+        //builder.append("[").append(record.getSourceClassName()).append(".");
+        //builder.append(record.getSourceMethodName()).append("] - \n");
         builder.append("\t[").append(record.getLevel()).append("] - ");
         builder.append(formatMessage(record));
         builder.append("\n\n");
