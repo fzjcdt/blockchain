@@ -25,7 +25,7 @@ public class LogUtil {
 
     private static Logger logger = setLoggerHanlder();
 
-    private static boolean logSwitch = true;
+    private static boolean logSwitch = false;
 
     private volatile static LogUtil instance;
 
