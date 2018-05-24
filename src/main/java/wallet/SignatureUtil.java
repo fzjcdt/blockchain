@@ -1,5 +1,7 @@
 package wallet;
 
+import util.KeyUtil;
+
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -22,6 +24,10 @@ public class SignatureUtil {
         return output;
     }
 
+    public static byte[] applySignature(String privateKey, String input) throws Exception {
+        return applySignature(KeyUtil.getPrivateKey(privateKey), input);
+    }
+
     public static boolean verifySignature(PublicKey publicKey, String data, byte[] signature) {
         try {
             Signature ecdsaVerify = Signature.getInstance("ECDSA", "BC");
@@ -31,6 +37,10 @@ public class SignatureUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static boolean verifySignature(String publicKey, String data, byte[] signature) throws Exception {
+        return verifySignature(KeyUtil.getPublicKey(publicKey), data, signature);
     }
 
     public static void main(String[] args) {

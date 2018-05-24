@@ -1,7 +1,6 @@
 package wallet;
 
 import log.LogUtil;
-import util.KeyUtil;
 import util.StringUtil;
 
 import java.security.*;
@@ -53,8 +52,8 @@ public class Wallet {
         System.out.println(priK);
 
         try {
-            signature = SignatureUtil.applySignature(KeyUtil.getPrivateKey(priK), s);
-            System.out.println(SignatureUtil.verifySignature(KeyUtil.getPublicKey(pubK), s, signature));
+            signature = SignatureUtil.applySignature(priK, s);
+            System.out.println(SignatureUtil.verifySignature(pubK, s, signature));
         } catch (Exception e) {
             e.printStackTrace();
         }
