@@ -4,9 +4,8 @@ public class TXInput {
     private String outputId;
     private TXOutput UTXO;
 
-    public TXInput(String outputId, TXOutput UTXO) {
+    public TXInput(String outputId) {
         setOutputId(outputId);
-        setUTXO(UTXO);
     }
 
     public String getOutputId() {

@@ -15,6 +15,10 @@ public class TXOutput {
         setId(generateId());
     }
 
+    public boolean isReceiver(String r) {
+        return receiver.equals(r);
+    }
+
     public String getId() {
         return id;
     }
