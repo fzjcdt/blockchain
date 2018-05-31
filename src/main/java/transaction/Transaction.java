@@ -11,6 +11,7 @@ public class Transaction {
     private String transactionId;
     private String sender;
     private String receiver;
+    private String merkleRoot;
     private double value;
     private byte[] signature;
 

@@ -3,9 +3,12 @@ package block;
 import log.LogUtil;
 import pow.ProofOfWork;
 import pow.ValidRst;
+import transaction.Transaction;
 import util.Sha256Util;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Level;
 
 public class Block {
@@ -14,6 +17,7 @@ public class Block {
     private String data;
     private long timeStamp;
     private long nonce = 0;
+    private List<Transaction> transactions;
 
     public Block() {
     }
@@ -24,6 +28,16 @@ public class Block {
         this.data = data;
         this.timeStamp = timeStamp;
         this.nonce = nonce;
+        transactions = new ArrayList<Transaction>();
+    }
+
+    public boolean addTransaction(Transaction transaction) {
+        if (transaction == null || !transaction.processTransaction()) {
+            return false;
+        }
+
+        transactions.add(transaction);
+        return true;
     }
 
     public static Block genesisBlock() {
