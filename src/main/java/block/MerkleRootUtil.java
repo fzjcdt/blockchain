@@ -8,7 +8,10 @@ import java.util.List;
 
 public class MerkleRootUtil {
 
-    public static String getMerkleRoot(ArrayList<Transaction> transactions) {
+    public static String getMerkleRoot(List<Transaction> transactions) {
+        if (transactions == null) {
+            return "";
+        }
         int count = transactions.size();
 
         List<String> previousTreeLayer = new ArrayList<String>();

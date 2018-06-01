@@ -18,6 +18,9 @@ public class Transaction {
     public List<TXInput> inputs;
     public List<TXOutput> outputs;
 
+    public Transaction() {
+    }
+
     public Transaction(String sender, String receiver, double value, List<TXInput> inputs) {
         setSender(sender);
         setReceiver(receiver);
@@ -46,17 +49,7 @@ public class Transaction {
             outputs.add(new TXOutput(this.sender, leftOver, transactionId));
         }
 
-        for (TXOutput output : outputs) {
-            UTXOSet.UTXOs.put(output.getId(), output);
-        }
-
-        for (TXInput input : inputs) {
-            if (input.getUTXO() == null) {
-                continue;
-            }
-
-            UTXOSet.UTXOs.remove(input.getUTXO().getId());
-        }
+        UTXOSet.update(this);
 
         return true;
     }
@@ -83,15 +76,6 @@ public class Transaction {
         double total = 0.0;
         for (TXInput input : inputs) {
             total += input.getUTXO().getValue();
-        }
-
-        return total;
-    }
-
-    public double getOutputValue() {
-        double total = 0.0;
-        for (TXOutput output : outputs) {
-            total += output.getValue();
         }
 
         return total;
@@ -140,12 +124,12 @@ public class Transaction {
         initTransaction.outputs.add(new TXOutput(initTransaction.getReceiver(), initTransaction.getValue(), initTransaction.getTransactionId()));
         UTXOSet.UTXOs.put(initTransaction.outputs.get(0).getId(), initTransaction.outputs.get(0));
 
-        System.out.println(Wallet.getBalance(w1.getPublicKey()));
-        System.out.println(Wallet.getBalance(w2.getPublicKey()));
+        System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
+        System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
 
-        Transaction transaction1 = Wallet.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
+        Transaction transaction1 = TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
         transaction1.processTransaction();
-        System.out.println(Wallet.getBalance(w1.getPublicKey()));
-        System.out.println(Wallet.getBalance(w2.getPublicKey()));
+        System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
+        System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
     }
 }

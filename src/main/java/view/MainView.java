@@ -63,7 +63,7 @@ public class MainView {
 
             blockModel.setValueAt(block.getPrevHash(), i, 0);
             blockModel.setValueAt(block.getHash(), i, 1);
-            blockModel.setValueAt(block.getData(), i, 2);
+            blockModel.setValueAt(block.getMerkleRoot(), i, 2);
             blockModel.setValueAt(String.valueOf(block.getNonce()), i, 3);
             blockModel.setValueAt(String.valueOf(block.getTimeStamp()), i, 4);
         }
@@ -323,7 +323,7 @@ public class MainView {
 
         newCells[0] = block.getPrevHash();
         newCells[1] = block.getHash();
-        newCells[2] = block.getData();
+        newCells[2] = block.getMerkleRoot();
         newCells[3] = String.valueOf(block.getNonce());
         newCells[4] = String.valueOf(block.getTimeStamp());
 

@@ -8,6 +8,8 @@ public class TXOutput {
     private double value;
     private String parentTXId;
 
+    public TXOutput() {
+    }
     public TXOutput(String receiver, double value, String parentTXId) {
         setReceiver(receiver);
         setValue(value);

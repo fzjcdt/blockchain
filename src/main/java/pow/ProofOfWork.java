@@ -36,7 +36,7 @@ public class ProofOfWork {
         String hash = Sha256Util.sha256Encryption(
                 block.getPrevHash() +
                         Long.toString(block.getTimeStamp()) +
-                        block.getData() +
+                        block.getMerkleRoot() +
                         Long.toString(nonce)
         );
 

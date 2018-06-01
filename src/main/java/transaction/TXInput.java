@@ -4,6 +4,9 @@ public class TXInput {
     private String outputId;
     private TXOutput UTXO;
 
+    public TXInput() {
+    }
+
     public TXInput(String outputId) {
         setOutputId(outputId);
     }

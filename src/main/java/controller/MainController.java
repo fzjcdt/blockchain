@@ -31,7 +31,7 @@ public class MainController {
 
     public static void mining(String data) {
         if (BlockChain.blockChain != null) {
-            BlockChain.addBlock(data);
+            BlockChain.addBlock();
             LogUtil.Log(Level.INFO, "Controller: mining");
         }
     }
