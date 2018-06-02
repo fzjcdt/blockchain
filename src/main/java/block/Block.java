@@ -46,16 +46,25 @@ public class Block {
         block.setNonce(validRst.getNonce());
         block.addCoinBase(publicKey);
 
+        /*
+        if (block.transactions != null) {
+            for (Transaction transaction : block.transactions) {
+                UTXOSet.update(transaction);
+            }
+        }
+        */
+
+        UTXOSet.update(block.coinbaseTransaction);
+
         LogUtil.Log(Level.INFO, "Generate a new block");
         return block;
     }
 
-    public void addCoinBase(String publicKey) {
-        Transaction coinbaseTransaction = new Transaction("coinbase", publicKey, 100, null);
+    public void addCoinBase(String minerWallet) {
+        Transaction coinbaseTransaction = new Transaction("coinbase", minerWallet, 100, null);
         coinbaseTransaction.setTransactionId("coinbase");
         coinbaseTransaction.outputs.add(new TXOutput(coinbaseTransaction.getReceiver(),
                 coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId()));
-        UTXOSet.UTXOs.put(coinbaseTransaction.outputs.get(0).getId(), coinbaseTransaction.outputs.get(0));
         setCoinbaseTransaction(coinbaseTransaction);
     }
 

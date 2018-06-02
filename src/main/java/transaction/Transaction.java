@@ -18,6 +18,8 @@ public class Transaction {
     public List<TXInput> inputs;
     public List<TXOutput> outputs;
 
+    private static volatile long sequence = 0;
+
     public Transaction() {
     }
 
@@ -55,7 +57,8 @@ public class Transaction {
     }
 
     private String calulateHash() {
-        return Sha256Util.sha256Encryption(sender + receiver + Double.toString(value));
+        sequence++;
+        return Sha256Util.sha256Encryption(sender + receiver + Double.toString(value) + Long.toString(sequence));
     }
 
     public void generateSignature(String privateKey) {
@@ -127,8 +130,7 @@ public class Transaction {
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
 
-        Transaction transaction1 = TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
-        transaction1.processTransaction();
+        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
     }

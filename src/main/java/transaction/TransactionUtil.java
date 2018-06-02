@@ -1,5 +1,7 @@
 package transaction;
 
+import block.BlockTransactions;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -22,9 +24,9 @@ public class TransactionUtil {
         return total;
     }
 
-    public static Transaction sendFunds(String sender, String priKey, String receiver, double value) {
+    public static boolean sendFunds(String sender, String priKey, String receiver, double value) {
         if (getBalance(sender) < value) {
-            return null;
+            return false;
         }
 
         List<TXInput> inputs = new ArrayList<TXInput>();
@@ -47,6 +49,6 @@ public class TransactionUtil {
         Transaction transaction = new Transaction(sender, receiver, value, inputs);
         transaction.generateSignature(priKey);
 
-        return transaction;
+        return BlockTransactions.addTransaction(transaction);
     }
 }

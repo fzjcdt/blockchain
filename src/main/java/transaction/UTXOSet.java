@@ -8,15 +8,21 @@ public class UTXOSet {
 
     public static synchronized void update(Transaction transaction) {
         for (TXOutput output : transaction.outputs) {
-            UTXOSet.UTXOs.put(output.getId(), output);
-        }
-
-        for (TXInput input : transaction.inputs) {
-            if (input.getUTXO() == null) {
+            if (output == null) {
                 continue;
             }
 
-            UTXOSet.UTXOs.remove(input.getUTXO().getId());
+            UTXOSet.UTXOs.put(output.getId(), output);
+        }
+
+        if (transaction.inputs != null) {
+            for (TXInput input : transaction.inputs) {
+                if (input.getUTXO() == null) {
+                    continue;
+                }
+
+                UTXOSet.UTXOs.remove(input.getUTXO().getId());
+            }
         }
     }
 }
