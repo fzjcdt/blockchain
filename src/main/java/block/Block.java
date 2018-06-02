@@ -3,7 +3,9 @@ package block;
 import log.LogUtil;
 import pow.ProofOfWork;
 import pow.ValidRst;
+import transaction.TXOutput;
 import transaction.Transaction;
+import transaction.UTXOSet;
 import util.Sha256Util;
 
 import java.util.Date;
@@ -17,6 +19,7 @@ public class Block {
     private long timeStamp;
     private long nonce = 0;
     private List<Transaction> transactions;
+    private Transaction coinbaseTransaction;
 
     public Block() {
     }
@@ -31,19 +34,29 @@ public class Block {
 
     public static Block genesisBlock() {
         LogUtil.Log(Level.INFO, "Create genesis block");
-        return generateNewBlock("", null);
+        return generateNewBlock("", null, "");
     }
 
-    public static Block generateNewBlock(String prevHash, List<Transaction> transactions) {
+    public static Block generateNewBlock(String prevHash, List<Transaction> transactions, String publicKey) {
         Block block = new Block("", prevHash, new Date().getTime(), 0, transactions);
         block.setMerkleRoot(MerkleRootUtil.getMerkleRoot(block.transactions));
         ProofOfWork pow = ProofOfWork.getProofOfWork(block);
         ValidRst validRst = pow.mining();
         block.setHash(validRst.getHash());
         block.setNonce(validRst.getNonce());
+        block.addCoinBase(publicKey);
 
         LogUtil.Log(Level.INFO, "Generate a new block");
         return block;
+    }
+
+    public void addCoinBase(String publicKey) {
+        Transaction coinbaseTransaction = new Transaction("coinbase", publicKey, 100, null);
+        coinbaseTransaction.setTransactionId("coinbase");
+        coinbaseTransaction.outputs.add(new TXOutput(coinbaseTransaction.getReceiver(),
+                coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId()));
+        UTXOSet.UTXOs.put(coinbaseTransaction.outputs.get(0).getId(), coinbaseTransaction.outputs.get(0));
+        setCoinbaseTransaction(coinbaseTransaction);
     }
 
     public boolean verifyHash() {
@@ -87,5 +100,13 @@ public class Block {
 
     public String getMerkleRoot() {
         return merkleRoot;
+    }
+
+    public Transaction getCoinbaseTransaction() {
+        return coinbaseTransaction;
+    }
+
+    public void setCoinbaseTransaction(Transaction coinbaseTransaction) {
+        this.coinbaseTransaction = coinbaseTransaction;
     }
 }

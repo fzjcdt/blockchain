@@ -35,7 +35,7 @@ public class BlockChainTest {
             switch (type) {
                 case 0:
                     data = readData();
-                    blockChain.addBlock();
+                    blockChain.addBlock("");
                     break;
                 case 1:
                     blockChain.printBlock();

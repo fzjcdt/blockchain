@@ -89,9 +89,9 @@ public class BlockChain {
         P2P.getInstance().dispatchToALL("give me the blockchain");
     }
 
-    public static void addBlock() {
+    public static void addBlock(String publicKey) {
         String prevHash = blockChain.get(blockChain.size() - 1).getHash();
-        Block newBlock = Block.generateNewBlock(prevHash, BlockTransactions.getAndClearTransactions());
+        Block newBlock = Block.generateNewBlock(prevHash, BlockTransactions.getAndClearTransactions(), publicKey);
         blockChain.add(newBlock);
         LogUtil.Log(Level.INFO, "Found a new block\n" + JsonUtil.toJson(newBlock));
         MainController.notifyAddBlock(newBlock);

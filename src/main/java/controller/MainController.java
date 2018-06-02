@@ -29,9 +29,9 @@ public class MainController {
         }
     }
 
-    public static void mining(String data) {
+    public static void mining(String publicKey) {
         if (BlockChain.blockChain != null) {
-            BlockChain.addBlock();
+            BlockChain.addBlock(publicKey);
             LogUtil.Log(Level.INFO, "Controller: mining");
         }
     }
