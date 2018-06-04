@@ -22,19 +22,18 @@ public class Test {
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
 
         // w2送w1 30金币, w1挖矿获得100, 总共w1 130, w2 70
-        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
+        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30, "w2 give w1 30");
         BlockChain.addBlock(w1.getPublicKey());
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
 
-
         // w2送w1 30金币, 总共w1 160, w2 40
-        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
+        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30, "w2 give w1 30");
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
 
         // w2送w1 30金币, w2挖矿获得100, 总共w1 190, w2 110
-        TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
+        TransactionUtil.sendFunds(w1.getPublicKey(), w1.getPrivateKey(), w2.getPublicKey(), 50, "w1 give w2 50");
         BlockChain.addBlock(w2.getPublicKey());
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));

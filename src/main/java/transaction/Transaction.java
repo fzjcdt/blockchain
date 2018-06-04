@@ -11,7 +11,8 @@ public class Transaction {
     private String transactionId;
     private String sender;
     private String receiver;
-    private String merkleRoot;
+    private String data;
+    private boolean dataFlag;
     private double value;
     private byte[] signature;
 
@@ -24,9 +25,19 @@ public class Transaction {
     }
 
     public Transaction(String sender, String receiver, double value, List<TXInput> inputs) {
+        this(sender, receiver, value, inputs, "", false);
+    }
+
+    public Transaction(String sender, String receiver, double value, List<TXInput> inputs, String data) {
+        this(sender, receiver, value, inputs, data, false);
+    }
+
+    public Transaction(String sender, String receiver, double value, List<TXInput> inputs, String data, boolean dataFlag) {
         setSender(sender);
         setReceiver(receiver);
         setValue(value);
+        setData(data);
+        setDataFlag(dataFlag);
         this.inputs = inputs;
         outputs = new ArrayList<TXOutput>();
     }
@@ -58,20 +69,22 @@ public class Transaction {
 
     private String calulateHash() {
         sequence++;
-        return Sha256Util.sha256Encryption(sender + receiver + Double.toString(value) + Long.toString(sequence));
+        return Sha256Util.sha256Encryption(sender + receiver + Double.toString(value)
+                + data + Boolean.toString(dataFlag) + Long.toString(sequence));
     }
 
     public void generateSignature(String privateKey) {
         try {
             this.signature = SignatureUtil.applySignature(privateKey,
-                    sender + receiver + Double.toString(value));
+                    sender + receiver + Double.toString(value)
+                            + data + Boolean.toString(dataFlag));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public boolean verifySignature() throws Exception {
-        String data = sender + receiver + Double.toString(value);
+        String data = sender + receiver + Double.toString(value) + this.data + Boolean.toString(dataFlag);
         return SignatureUtil.verifySignature(sender, data, signature);
     }
 
@@ -133,5 +146,21 @@ public class Transaction {
         TransactionUtil.sendFunds(w2.getPublicKey(), w2.getPrivateKey(), w1.getPublicKey(), 30);
         System.out.println(TransactionUtil.getBalance(w1.getPublicKey()));
         System.out.println(TransactionUtil.getBalance(w2.getPublicKey()));
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public boolean isDataFlag() {
+        return dataFlag;
+    }
+
+    public void setDataFlag(boolean dataFlag) {
+        this.dataFlag = dataFlag;
     }
 }

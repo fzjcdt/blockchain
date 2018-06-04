@@ -24,7 +24,18 @@ public class TransactionUtil {
         return total;
     }
 
-    public static boolean sendFunds(String sender, String priKey, String receiver, double value) {
+    public static boolean sendFunds(String sender, String priKey, String receiver,
+                                    double value) {
+        return sendFunds(sender, priKey, receiver, value, "");
+    }
+
+    public static boolean sendFunds(String sender, String priKey, String receiver,
+                                    double value, String data) {
+        return sendFunds(sender, priKey, receiver, value, data, false);
+    }
+
+    public static boolean sendFunds(String sender, String priKey, String receiver,
+                                    double value, String data, boolean dataFlag) {
         if (getBalance(sender) < value) {
             return false;
         }
@@ -46,7 +57,7 @@ public class TransactionUtil {
             }
         }
 
-        Transaction transaction = new Transaction(sender, receiver, value, inputs);
+        Transaction transaction = new Transaction(sender, receiver, value, inputs, data, dataFlag);
         transaction.generateSignature(priKey);
 
         return BlockTransactions.addTransaction(transaction);
