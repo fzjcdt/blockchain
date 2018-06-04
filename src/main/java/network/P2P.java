@@ -2,7 +2,9 @@ package network;
 
 import block.Block;
 import block.BlockChain;
+import block.BlockTransactions;
 import log.LogUtil;
+import transaction.Transaction;
 import util.SerializeUtil;
 
 import java.io.IOException;
@@ -97,6 +99,8 @@ public class P2P {
                     // 别的节点的全链回复
                     LogUtil.Log(Level.INFO, "Receive a blockchain check");
                     BlockChain.receiveBlockChainHandle((List<Block>) obj);
+                } else if (obj instanceof Transaction) {
+                    BlockTransactions.addTransaction((Transaction) obj);
                 } else {
                     // 别的节点的整条链请求
                     // 实际上是能拿到发过来的ip的, 用socket就好, 不用多播, 但用ip是否意味着不是匿名了?

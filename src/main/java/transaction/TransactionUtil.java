@@ -60,6 +60,6 @@ public class TransactionUtil {
         Transaction transaction = new Transaction(sender, receiver, value, inputs, data, dataFlag);
         transaction.generateSignature(priKey);
 
-        return BlockTransactions.addTransaction(transaction);
+        return BlockTransactions.addTransaction(transaction, true);
     }
 }

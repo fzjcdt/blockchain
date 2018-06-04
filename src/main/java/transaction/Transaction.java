@@ -51,12 +51,18 @@ public class Transaction {
             return false;
         }
 
+        TXOutput output;
         for (TXInput input : inputs) {
-            input.setUTXO(UTXOSet.UTXOs.get(input.getOutputId()));
+            output = UTXOSet.UTXOs.get(input.getOutputId());
+            if (output != null) {
+                input.setUTXO(output);
+            } else {
+                return false;
+            }
         }
 
         double leftOver = getInputsValue() - value;
-        transactionId = calulateHash();
+        setTransactionId();
         outputs.add(new TXOutput(this.receiver, value, transactionId));
         if (leftOver > 0) {
             outputs.add(new TXOutput(this.sender, leftOver, transactionId));
@@ -103,6 +109,10 @@ public class Transaction {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public void setTransactionId() {
+        this.transactionId = calulateHash();
     }
 
     public String getSender() {

@@ -4,6 +4,7 @@ import controller.MainController;
 import log.LogUtil;
 import network.P2P;
 import pow.ProofOfWork;
+import transaction.UTXOSet;
 import util.JsonUtil;
 
 import java.util.ArrayList;
@@ -102,6 +103,8 @@ public class BlockChain {
     public static void addBlock(Block block) {
         if (isValidBlock(block)) {
             blockChain.add(block);
+            UTXOSet.update(block.getCoinbaseTransaction());
+            BlockTransactions.clear();
             MainController.notifyAddBlock(block);
             LogUtil.Log(Level.INFO, "Add a legal block discovered by other node\n"
                     + JsonUtil.toJson(block));

@@ -1,5 +1,6 @@
 package block;
 
+import network.P2P;
 import transaction.Transaction;
 
 import java.util.ArrayList;
@@ -10,11 +11,19 @@ public class BlockTransactions {
     private static volatile List<Transaction> transactions = new ArrayList<Transaction>();
 
     public static synchronized boolean addTransaction(Transaction transaction) {
+        // 默认不广播出去
+        return addTransaction(transaction, false);
+    }
+
+    public static synchronized boolean addTransaction(Transaction transaction, boolean dispatch) {
         if (transaction == null || !transaction.processTransaction()) {
             return false;
         }
 
         transactions.add(transaction);
+        if (dispatch) {
+            P2P.getInstance().dispatchToALL(transaction);
+        }
         return true;
     }
 
@@ -22,5 +31,9 @@ public class BlockTransactions {
         List<Transaction> temp = transactions;
         transactions = new ArrayList<Transaction>();
         return temp;
+    }
+
+    public static synchronized void clear() {
+        transactions = new ArrayList<Transaction>();
     }
 }

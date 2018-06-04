@@ -46,13 +46,11 @@ public class Block {
         block.setNonce(validRst.getNonce());
         block.addCoinBase(publicKey);
 
-        /*
         if (block.transactions != null) {
             for (Transaction transaction : block.transactions) {
                 UTXOSet.update(transaction);
             }
         }
-        */
 
         UTXOSet.update(block.coinbaseTransaction);
 
@@ -62,7 +60,7 @@ public class Block {
 
     public void addCoinBase(String minerWallet) {
         Transaction coinbaseTransaction = new Transaction("coinbase", minerWallet, 100, null);
-        coinbaseTransaction.setTransactionId("coinbase");
+        coinbaseTransaction.setTransactionId();
         coinbaseTransaction.outputs.add(new TXOutput(coinbaseTransaction.getReceiver(),
                 coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId()));
         setCoinbaseTransaction(coinbaseTransaction);

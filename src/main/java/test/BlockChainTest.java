@@ -2,7 +2,8 @@ package test;
 
 import block.BlockChain;
 import network.P2P;
-import view.MainView;
+import transaction.TransactionUtil;
+import wallet.Wallet;
 
 import java.util.Scanner;
 
@@ -23,25 +24,31 @@ public class BlockChainTest {
         BlockChain blockChain = BlockChain.newBlockChain();
         BlockChain.updataBlockChainFromOtherNodes();
         int type = 0;
-        String data = "";
         P2P.getInstance();
+        Wallet wallet = new Wallet();
 
         while (true) {
-            System.out.println("*** quit:-1, add block:0, print:1 ***");
+            System.out.println("-1: quit\n0: add block\n1: print\n2: print pubkey\n3: add transaction\n4: print balance");
             type = input.nextInt();
             if (type == -1) {
                 break;
             }
             switch (type) {
                 case 0:
-                    data = readData();
-                    blockChain.addBlock("");
+                    blockChain.addBlock(wallet.getPublicKey());
                     break;
                 case 1:
                     blockChain.printBlock();
                     break;
                 case 2:
-                    new MainView().init();
+                    System.out.println(wallet.getPublicKey());
+                    break;
+                // new MainView().init();
+                case 3:
+                    TransactionUtil.sendFunds(wallet.getPublicKey(), wallet.getPrivateKey(), readData(), 10);
+                    break;
+                case 4:
+                    System.out.println(TransactionUtil.getBalance(wallet.getPublicKey()));
             }
         }
     }
