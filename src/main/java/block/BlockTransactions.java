@@ -2,6 +2,7 @@ package block;
 
 import network.P2P;
 import transaction.Transaction;
+import transaction.UTXOSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +17,16 @@ public class BlockTransactions {
     }
 
     public static synchronized boolean addTransaction(Transaction transaction, boolean dispatch) {
-        if (transaction == null || !transaction.processTransaction()) {
+        if (transaction == null) {
             return false;
+        }
+
+        if (dispatch) {
+            if (!transaction.processTransaction()) {
+                return false;
+            }
+        } else {
+            UTXOSet.update(transaction);
         }
 
         transactions.add(transaction);
