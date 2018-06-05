@@ -122,4 +122,8 @@ public class Block {
     public void setCoinbaseTransaction(Transaction coinbaseTransaction) {
         this.coinbaseTransaction = coinbaseTransaction;
     }
+
+    public List<Transaction> getTransactions() {
+        return this.transactions;
+    }
 }
