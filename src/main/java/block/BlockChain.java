@@ -4,6 +4,7 @@ import controller.MainController;
 import log.LogUtil;
 import network.P2P;
 import pow.ProofOfWork;
+import transaction.UTXOSet;
 import util.JsonUtil;
 
 import java.util.ArrayList;
@@ -24,10 +25,15 @@ public class BlockChain {
         return new BlockChain();
     }
 
-    public static void receiveBlockChainHandle(List<Block> bc) {
+    public static synchronized void receiveBlockChainHandle(List<Block> bc) {
         if (bc.size() >= blockChain.size() && isValidBlockChain(bc)) {
             LogUtil.Log(Level.INFO, "Find a valid and longer blockchain from other node");
             blockChain = bc;
+            BlockTransactions.clear();
+            UTXOSet.clear();
+            for (Block block : blockChain) {
+                block.processTransaction();
+            }
             LogUtil.Log(Level.INFO, "Updated to a valid and longer chain");
             MainController.notifyUpdateBlockChain();
         } else {

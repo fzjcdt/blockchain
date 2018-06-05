@@ -29,4 +29,8 @@ public class UTXOSet {
     public static boolean inUTXOs(String UTXOId) {
         return UTXOs.containsKey(UTXOId);
     }
+
+    public static void clear() {
+        UTXOs.clear();
+    }
 }

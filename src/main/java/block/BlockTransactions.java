@@ -37,6 +37,7 @@ public class BlockTransactions {
             // 加入历史id，防止挖矿时，清空了lockUTXOs，但没有在UTXOset处理时，可能出现了重复使用情况
             // 实际上不用清空lockUTXOs就能避免这个情况，
             // 但可能会导致在当前节点网络极差，几乎失去连接的情况下，锁住账户的问题
+            // 加上了lockUTXOs清除机制后，不会出现上面情况
             historyTransaction.add(transaction.getTransactionId());
             transactions.add(transaction);
             if (dispatch) {
@@ -44,9 +45,9 @@ public class BlockTransactions {
             }
 
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     public static synchronized List<Transaction> getAndClearTransactions() {
@@ -58,6 +59,7 @@ public class BlockTransactions {
 
     public static synchronized void clear() {
         transactions.clear();
+        lockUTXOs.clear();
     }
 
     public static boolean inTransaction(String UTXOId) {
