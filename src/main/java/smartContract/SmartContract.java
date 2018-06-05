@@ -11,10 +11,24 @@ public class SmartContract {
     private static final Calculator[] calculators = {new CalculatorFocusOnTimes(),
             new CalculatorFocusOnValue(), new CalculatorMix()};
 
-    public static List getBlackList() {
-        Map<String, List<ReportItem>> reportItems = getAllReportItem();
+    public static List<BlackListRst> getBlackList() {
+        List<BlackListRst> rst = new ArrayList<BlackListRst>();
 
-        return null;
+        Map<String, List<ReportItem>> totalReportItems = getAllReportItem();
+        Iterator<Map.Entry<String, List<ReportItem>>> it = totalReportItems.entrySet().iterator();
+
+        Map.Entry<String, List<ReportItem>> entry;
+        while (it.hasNext()) {
+            entry = it.next();
+            BlackListRst blackListRst = new BlackListRst(entry.getKey());
+            for (Calculator c : calculators) {
+                blackListRst.addValue(c.calculate(entry.getValue()));
+            }
+
+            rst.add(blackListRst);
+        }
+
+        return rst;
     }
 
     private static void addReportItemInBlock(Map<String, List<ReportItem>> rst, Block block) {

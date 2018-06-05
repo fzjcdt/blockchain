@@ -15,6 +15,6 @@ public class CalculatorMix implements Calculator {
             }
         }
 
-        return rst;
+        return (double) Math.round(rst * 100) / 100;
     }
 }
