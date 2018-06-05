@@ -8,6 +8,7 @@ import transaction.Transaction;
 import transaction.UTXOSet;
 import util.Sha256Util;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,27 +41,32 @@ public class Block {
     public static Block generateNewBlock(String prevHash, List<Transaction> transactions, String publicKey) {
         Block block = new Block("", prevHash, new Date().getTime(), 0, transactions);
         block.setMerkleRoot(MerkleRootUtil.getMerkleRoot(block.transactions));
+
         ProofOfWork pow = ProofOfWork.getProofOfWork(block);
         ValidRst validRst = pow.mining();
         block.setHash(validRst.getHash());
         block.setNonce(validRst.getNonce());
+
         block.addCoinBase(publicKey);
-
-        if (block.transactions != null) {
-            for (Transaction transaction : block.transactions) {
-                UTXOSet.update(transaction);
-            }
-        }
-
-        UTXOSet.update(block.coinbaseTransaction);
+        block.processTransaction();
 
         LogUtil.Log(Level.INFO, "Generate a new block");
         return block;
     }
 
+    public void processTransaction() {
+        if (this.transactions != null) {
+            for (Transaction transaction : this.transactions) {
+                UTXOSet.update(transaction);
+            }
+        }
+
+        UTXOSet.update(this.coinbaseTransaction);
+    }
+
     public void addCoinBase(String minerWallet) {
         Transaction coinbaseTransaction = new Transaction("coinbase", minerWallet, 100, null);
-        coinbaseTransaction.setTransactionId();
+        coinbaseTransaction.setOutputs(new ArrayList<TXOutput>());
         coinbaseTransaction.outputs.add(new TXOutput(coinbaseTransaction.getReceiver(),
                 coinbaseTransaction.getValue(), coinbaseTransaction.getTransactionId()));
         setCoinbaseTransaction(coinbaseTransaction);

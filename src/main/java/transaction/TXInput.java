@@ -11,6 +11,11 @@ public class TXInput {
         setOutputId(outputId);
     }
 
+    public TXInput(String outputId, TXOutput output) {
+        setOutputId(outputId);
+        setUTXO(output);
+    }
+
     public String getOutputId() {
         return outputId;
     }

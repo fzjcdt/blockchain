@@ -21,8 +21,12 @@ public class UTXOSet {
                     continue;
                 }
 
-                UTXOSet.UTXOs.remove(input.getUTXO().getId());
+                UTXOSet.UTXOs.remove(input.getOutputId());
             }
         }
+    }
+
+    public static boolean inUTXOs(String UTXOId) {
+        return UTXOs.containsKey(UTXOId);
     }
 }

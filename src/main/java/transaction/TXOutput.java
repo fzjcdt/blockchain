@@ -10,6 +10,7 @@ public class TXOutput {
 
     public TXOutput() {
     }
+
     public TXOutput(String receiver, double value, String parentTXId) {
         setReceiver(receiver);
         setValue(value);
