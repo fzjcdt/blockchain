@@ -5,6 +5,8 @@ import block.BlockChain;
 import controller.MainController;
 import log.LogUtil;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
+import smartContract.BlackListRst;
+import smartContract.SmartContract;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 import util.JsonUtil;
 import util.KeyUtil;
@@ -18,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.logging.Level;
 
 public class MainView {
@@ -26,7 +29,11 @@ public class MainView {
     static JTable blockTable;
     static JPopupMenu popupMenu;
     static int RowNum = 0;
-    private static final int BLOCK_COLUMN = 5;
+    static DefaultTableModel ipModel;
+    static JTable ipTable;
+    static int ipRowNum = 0;
+    private static final int BLOCK_COLUMN = 4;
+    private static final int IP_COLUMN = 4;
 
     public void init() {
         try {
@@ -66,6 +73,26 @@ public class MainView {
             blockModel.setValueAt(block.getHash(), i, 1);
             blockModel.setValueAt(String.valueOf(block.getNonce()), i, 2);
             blockModel.setValueAt(String.valueOf(block.getTimeStamp()), i, 3);
+        }
+    }
+
+    private static void setIpModel() {
+        String[] headerNames = {"Ip", "Algorithm 1", "Algorithm 2", "Algorithm 3"};
+        if (BlockChain.blockChain == null) {
+            ipModel = new DefaultTableModel(headerNames, 0);
+            return;
+        }
+
+        List<BlackListRst> list = SmartContract.getBlackList();
+        ipModel = new DefaultTableModel(headerNames, list.size());
+
+        for (int i = 0, len = list.size(); i < len; i++) {
+            BlackListRst rst = list.get(i);
+
+            ipModel.setValueAt(rst.getIp(), i, 0);
+            ipModel.setValueAt(rst.getValue().get(0), i, 1);
+            ipModel.setValueAt(rst.getValue().get(1), i, 2);
+            ipModel.setValueAt(rst.getValue().get(2), i, 3);
         }
     }
 
@@ -139,6 +166,41 @@ public class MainView {
         );
     }
 
+    private static void setIpTable() {
+        setIpModel();
+        ipTable = new JTable(ipModel);
+        ipTable.setFont(new Font("Monospaced", Font.PLAIN, 20));
+        ipTable.getTableHeader().setFont(new Font("Monospaced", Font.BOLD, 22));
+        ipTable.setRowHeight(24);
+
+        /*
+        ipTable.getColumnModel().getColumn(0).setPreferredWidth(240);
+        ipTable.getColumnModel().getColumn(1).setPreferredWidth(240);
+        ipTable.getColumnModel().getColumn(2).setPreferredWidth(80);
+        ipTable.getColumnModel().getColumn(3).setPreferredWidth(80);
+        */
+
+        // 数据居中
+        DefaultTableCellRenderer render = new DefaultTableCellRenderer();
+        render.setHorizontalAlignment(SwingConstants.CENTER);
+        ipTable.setDefaultRenderer(Object.class, render);
+
+        // 表头居中
+        DefaultTableCellHeaderRenderer hr = new DefaultTableCellHeaderRenderer();
+        hr.setHorizontalAlignment(JLabel.CENTER);
+        ipTable.getTableHeader().setDefaultRenderer(hr);
+
+        ipTable.addMouseListener(
+                new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        //super.mouseClicked(e);
+                        // mouseRightButtonClick(e);
+                    }
+                }
+        );
+    }
+
     private JPanel getBlockPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -151,6 +213,10 @@ public class MainView {
 
     private JPanel getIpPanel() {
         JPanel panel = new JPanel();
+
+        panel.setLayout(new BorderLayout());
+        setIpTable();
+        panel.add(new JScrollPane(ipTable), BorderLayout.CENTER);
 
         return panel;
     }
@@ -173,8 +239,8 @@ public class MainView {
 
         tabbedPane.addTab("Block", null, getBlockPanel(), "Block information");
         tabbedPane.addTab(" Ip  ", null, getIpPanel(), "IP maliciousness");
-        tabbedPane.addTab("User ", null, getUserPanel(), "User's ranking");
-        tabbedPane.addTab("Mining", null, getMinePanel(), "Panel for mining");
+        // tabbedPane.addTab("User ", null, getUserPanel(), "User's ranking");
+        // tabbedPane.addTab("Mining", null, getMinePanel(), "Panel for mining");
 
         return tabbedPane;
     }
@@ -195,6 +261,7 @@ public class MainView {
 
         menu.add(getJoinBLockChainMenuItem());
         menu.add(getupdateMenuItem());
+        menu.add(getReloadIpMenuItem());
 
         return menu;
     }
@@ -303,8 +370,24 @@ public class MainView {
         return joinItem;
     }
 
+    private JMenuItem getReloadIpMenuItem() {
+        JMenuItem updateItem = new JMenuItem("Reload ip");
+        updateItem.setFont(new Font("Monospaced", Font.BOLD, 12));
+        updateItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // JProgressBar.generateProgressBar(2, "Update...");
+                        updateIp();
+                    }
+                }
+        );
+
+        return updateItem;
+    }
+
     private JMenuItem getupdateMenuItem() {
-        JMenuItem updateItem = new JMenuItem("Reload");
+        JMenuItem updateItem = new JMenuItem("Reload block");
         updateItem.setFont(new Font("Monospaced", Font.BOLD, 12));
         updateItem.addActionListener(
                 new ActionListener() {
@@ -375,6 +458,28 @@ public class MainView {
             for (Block block : BlockChain.blockChain) {
                 addTableRow(block);
             }
+        }
+    }
+
+    public static void addIpRow(smartContract.BlackListRst rst) {
+        String[] newCells = new String[IP_COLUMN];
+
+        newCells[0] = rst.getIp();
+        newCells[1] = String.valueOf(rst.getValue().get(0));
+        newCells[2] = String.valueOf(rst.getValue().get(1));
+        newCells[3] = String.valueOf(rst.getValue().get(2));
+
+        ipModel.addRow(newCells);
+    }
+
+    public static void updateIp() {
+        while (ipModel.getRowCount() != 0) {
+            ipModel.removeRow(0);
+        }
+
+        List<BlackListRst> list = SmartContract.getBlackList();
+        for (int i = 0, len = list.size(); i < len; i++) {
+            addIpRow(list.get(i));
         }
     }
 
