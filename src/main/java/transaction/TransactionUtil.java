@@ -115,14 +115,6 @@ public class TransactionUtil {
         return transaction != null && BlockTransactions.addTransaction(transaction, true);
     }
 
-    public static synchronized boolean reportBlackList(String sender, String priKey, double value, String ip) {
-        return sendFunds(sender, priKey, "", value, ip, false);
-    }
-
-    public static synchronized boolean reportBlackList(String sender, String priKey, double value, String ip, boolean relieve) {
-        return sendFunds(sender, priKey, "", value, ip, relieve);
-    }
-
     public static boolean isValidTransaction(Transaction transaction) {
         try {
             if (!transaction.verifySignature()) {

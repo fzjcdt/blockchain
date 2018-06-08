@@ -7,6 +7,7 @@ import log.LogUtil;
 import org.jb2011.lnf.beautyeye.BeautyEyeLNFHelper;
 import sun.swing.table.DefaultTableCellHeaderRenderer;
 import util.JsonUtil;
+import util.KeyUtil;
 import wallet.Wallet;
 
 import javax.swing.*;
@@ -50,7 +51,7 @@ public class MainView {
     }
 
     private static void setBlockModel() {
-        String[] headerNames = {"prevHash", "hash", "data", "nonce", "timeStamp"};
+        String[] headerNames = {"prevHash", "hash", "nonce", "timeStamp"};
         if (BlockChain.blockChain == null) {
             blockModel = new DefaultTableModel(headerNames, 0);
             return;
@@ -63,9 +64,8 @@ public class MainView {
 
             blockModel.setValueAt(block.getPrevHash(), i, 0);
             blockModel.setValueAt(block.getHash(), i, 1);
-            blockModel.setValueAt(block.getMerkleRoot(), i, 2);
-            blockModel.setValueAt(String.valueOf(block.getNonce()), i, 3);
-            blockModel.setValueAt(String.valueOf(block.getTimeStamp()), i, 4);
+            blockModel.setValueAt(String.valueOf(block.getNonce()), i, 2);
+            blockModel.setValueAt(String.valueOf(block.getTimeStamp()), i, 3);
         }
     }
 
@@ -79,7 +79,7 @@ public class MainView {
                     public void actionPerformed(ActionEvent e) {
                         MyDialog.showMessageDialog(JsonUtil.toJson(BlockChain.blockChain.get(RowNum)),
                                 JOptionPane.PLAIN_MESSAGE,
-                                JOptionPane.OK_OPTION, "", 600, 240);
+                                JOptionPane.OK_OPTION, "", 600, 500);
                     }
                 }
         );
@@ -116,7 +116,6 @@ public class MainView {
         blockTable.getColumnModel().getColumn(1).setPreferredWidth(240);
         blockTable.getColumnModel().getColumn(2).setPreferredWidth(80);
         blockTable.getColumnModel().getColumn(3).setPreferredWidth(80);
-        blockTable.getColumnModel().getColumn(4).setPreferredWidth(80);
 
         // 数据居中
         DefaultTableCellRenderer render = new DefaultTableCellRenderer();
@@ -200,6 +199,30 @@ public class MainView {
         return menu;
     }
 
+    private JMenu getTransactionMenu() {
+        JMenu menu = new JMenu("Report");
+        menu.setFont(new Font("Monospaced", Font.BOLD, 14));
+
+        menu.add(getReportingMenuItem());
+
+        return menu;
+    }
+
+    private JMenuItem getReportingMenuItem() {
+        JMenuItem reportingItem = new JMenuItem("report ip");
+        reportingItem.setFont(new Font("Monospaced", Font.BOLD, 12));
+        reportingItem.addActionListener(
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        TransactionDialog t = new TransactionDialog();
+                    }
+                }
+        );
+
+        return reportingItem;
+    }
+
     private JMenu getMiningMenu() {
         JMenu menu = new JMenu("Mine");
         menu.setFont(new Font("Monospaced", Font.BOLD, 14));
@@ -247,8 +270,14 @@ public class MainView {
                         Object pubKey = MyDialog.showInputDialog("Enter public key", JOptionPane.PLAIN_MESSAGE,
                                 JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
                         if (pubKey != null) {
-                            mainFrame.setTitle(pubKey.toString());
-                            LogUtil.Log(Level.INFO, "View: login");
+                            if (KeyUtil.isValidPublicKey(pubKey.toString())) {
+                                mainFrame.setTitle(pubKey.toString());
+                                LogUtil.Log(Level.INFO, "View: login");
+                            } else {
+                                MyDialog.showMessageDialog("Invalid public key",
+                                        JOptionPane.PLAIN_MESSAGE,
+                                        JOptionPane.OK_OPTION, "", 600, 100);
+                            }
                         }
                     }
                 }
@@ -297,11 +326,18 @@ public class MainView {
                 new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        Object data = MyDialog.showInputDialog("Input the data:", JOptionPane.PLAIN_MESSAGE,
-                                JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
-                        JProgressBar.generateProgressBar(5, "Mining...");
-                        MainController.mining(data.toString());
-                        LogUtil.Log(Level.INFO, "View: mining");
+                        // Object data = MyDialog.showInputDialog("Input the data:", JOptionPane.PLAIN_MESSAGE,
+                        //        JOptionPane.OK_CANCEL_OPTION, "", 500, 180);
+                        String publicKey = mainFrame.getTitle();
+                        if (!"".equals(publicKey) && publicKey != null && KeyUtil.isValidPublicKey(publicKey)) {
+                            JProgressBar.generateProgressBar(5, "Mining...");
+                            MainController.mining(publicKey);
+                            LogUtil.Log(Level.INFO, "View: mining");
+                        } else {
+                            MyDialog.showMessageDialog("请先登录",
+                                    JOptionPane.PLAIN_MESSAGE,
+                                    JOptionPane.OK_OPTION, "", 600, 100);
+                        }
                     }
                 }
         );
@@ -313,6 +349,7 @@ public class MainView {
         JMenuBar menuBar = new JMenuBar();
         menuBar.add(getLoginMenu());
         menuBar.add(getUpdateMenu());
+        menuBar.add(getTransactionMenu());
         menuBar.add(getMiningMenu());
 
         return menuBar;
@@ -323,9 +360,8 @@ public class MainView {
 
         newCells[0] = block.getPrevHash();
         newCells[1] = block.getHash();
-        newCells[2] = block.getMerkleRoot();
-        newCells[3] = String.valueOf(block.getNonce());
-        newCells[4] = String.valueOf(block.getTimeStamp());
+        newCells[2] = String.valueOf(block.getNonce());
+        newCells[3] = String.valueOf(block.getTimeStamp());
 
         blockModel.addRow(newCells);
     }

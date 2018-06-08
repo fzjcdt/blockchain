@@ -28,4 +28,22 @@ public class KeyUtil {
         PrivateKey privateKey = keyFactory.generatePrivate(keySpec);
         return privateKey;
     }
+
+    public static boolean isValidPublicKey(String key) {
+        try {
+            getPublicKey(key);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isValidPrivateKey(String key) {
+        try {
+            getPrivateKey(key);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
