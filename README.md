@@ -15,3 +15,6 @@ A project for blockchain learning
 
 #### 日志
  ![日志](https://github.com/fzjcdt/blockchain/raw/master/screenshots/log.png)
+
+### License
+This project is licensed under [GLWTPL](./LICENSE)

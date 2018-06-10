@@ -98,7 +98,7 @@ public class TransactionDialog {
                         if (v >= 0) {
                             suc = Report.reportBlackList(publicKey, privateKey, v, ipNumber);
                         } else {
-                            suc = Report.reportBlackList(publicKey, privateKey, v, ipNumber, true);
+                            suc = Report.reportBlackList(publicKey, privateKey, -1 * v, ipNumber, true);
                         }
 
                         if (suc) {
