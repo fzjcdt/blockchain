@@ -16,8 +16,8 @@ import java.util.logging.Level;
 
 public class P2P {
 
-    private static final int MAX_LEN = 40960;
-    // private static final String HOST = "127.0.0.1";
+    private static final int MAX_LEN = 409600;
+    //private static final String HOST = "127.0.0.1";
     private static final String HOST = "119.29.17.101";
     private static final int PORT = 9999;
 
@@ -86,9 +86,10 @@ public class P2P {
                 int len = is.read(b);
 
                 Object obj = SerializeUtil.deserialize(b);
-                if (obj == null)
+                if (obj == null) {
                     continue;
-                System.out.println(obj.getClass());
+                }
+
                 if (obj instanceof Block) {
                     // 别的节点挖出了新节点
                     LogUtil.Log(Level.INFO, "Receive a block");
