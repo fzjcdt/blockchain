@@ -8,35 +8,36 @@ import transaction.Transaction;
 import util.SerializeUtil;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.Socket;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.List;
 import java.util.logging.Level;
 
-public class P2P {
+public class P2PLocalArea {
 
-    private static final int MAX_LEN = 40960;
-    private static final String HOST = "127.0.0.1";
-    private static final int PORT = 9999;
+    private static final String BROADCAST_IP = "230.0.0.1";
+    private static final int BROADCAST_PORT = 3000;
+    private static final int MAX_LEN = 4096;
 
+    private MulticastSocket multiCastSocket = null;
+    private InetAddress broadcastAddress = null;
     byte[] inBuff = new byte[MAX_LEN];
+    private DatagramPacket inPacket = new DatagramPacket(inBuff, inBuff.length);
 
     public Thread receiveThread;
 
-    private volatile static P2P instance;
+    private volatile static P2PLocalArea instance;
 
-    private Socket socket;
-
-    private P2P() {
+    private P2PLocalArea() {
         init();
     }
 
-    public static P2P getInstance() {
+    public static P2PLocalArea getInstance() {
         if (instance == null) {
-            synchronized (P2P.class) {
+            synchronized (P2PLocalArea.class) {
                 if (instance == null) {
-                    instance = new P2P();
+                    instance = new P2PLocalArea();
                     LogUtil.Log(Level.INFO, "Init P2P...");
                     instance.start();
                 }
@@ -48,7 +49,10 @@ public class P2P {
 
     private void init() {
         try {
-            socket = new Socket(HOST, PORT);
+            multiCastSocket = new MulticastSocket(BROADCAST_PORT);
+            broadcastAddress = InetAddress.getByName(BROADCAST_IP);
+            multiCastSocket.joinGroup(broadcastAddress);
+            multiCastSocket.setLoopbackMode(false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -74,7 +78,8 @@ public class P2P {
 
     public void stop() throws IOException {
         try {
-            socket.close();
+            receiveThread.interrupt();
+            multiCastSocket.close();
             LogUtil.Log(Level.INFO, "P2P stop listening");
         } catch (NullPointerException n) {
             n.printStackTrace();
@@ -84,11 +89,8 @@ public class P2P {
     public void listen() throws IOException {
         while (true) {
             try {
-                InputStream is = socket.getInputStream();
-                byte[] b = new byte[MAX_LEN];
-                int len = is.read(b);
-
-                Object obj = SerializeUtil.deserialize(b);
+                multiCastSocket.receive(inPacket);
+                Object obj = SerializeUtil.deserialize(inBuff);
                 if (obj instanceof Block) {
                     // 别的节点挖出了新节点
                     LogUtil.Log(Level.INFO, "Receive a block");
@@ -114,10 +116,11 @@ public class P2P {
 
     public void dispatchToALL(Object obj) {
         byte[] buf = SerializeUtil.serialize(obj);
-
+        DatagramPacket datagramPacket = new DatagramPacket(buf, buf.length);
+        datagramPacket.setAddress(broadcastAddress);
+        datagramPacket.setPort(BROADCAST_PORT);
         try {
-            OutputStream os = socket.getOutputStream();
-            os.write(buf);
+            multiCastSocket.send(datagramPacket);
             LogUtil.Log(Level.INFO, "P2P dispatch to other nodes");
         } catch (IOException e) {
             e.printStackTrace();

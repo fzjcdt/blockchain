@@ -19,7 +19,7 @@ public class SerializeUtil {
     }
 
     public static byte[] serialize(Object obj) {
-        Output output = new Output(4096, -1);
+        Output output = new Output(40960, -1);
         new Kryo().writeClassAndObject(output, obj);
         byte[] bytes = output.toBytes();
         output.close();

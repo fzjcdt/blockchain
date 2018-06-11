@@ -23,19 +23,16 @@ public class ServerThread extends Thread {
         try {
             while (true) {
                 is = socket.getInputStream();
-                byte[] b = new byte[409600];
+                byte[] b = new byte[40960];
                 int len = is.read(b);
-                System.out.println("len: " + len);
                 if (len == -1) {
                     list.remove(socket);
                     break;
                 }
-                String str = new String(b, 0, len);
-                System.out.println(str);
                 for (Socket socket : list) {
                     if (this.socket != socket) {
                         os = socket.getOutputStream();
-                        os.write(str.getBytes());
+                        os.write(b);
                     }
                 }
             }
