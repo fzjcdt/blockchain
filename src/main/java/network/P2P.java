@@ -17,7 +17,8 @@ import java.util.logging.Level;
 public class P2P {
 
     private static final int MAX_LEN = 40960;
-    private static final String HOST = "127.0.0.1";
+    // private static final String HOST = "127.0.0.1";
+    private static final String HOST = "119.29.17.101";
     private static final int PORT = 9999;
 
     byte[] inBuff = new byte[MAX_LEN];
@@ -55,11 +56,7 @@ public class P2P {
 
         receiveThread = new Thread(new Runnable() {
             public void run() {
-                try {
-                    listen();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                listen();
             }
         });
     }
@@ -81,7 +78,7 @@ public class P2P {
         }
     }
 
-    public void listen() throws IOException {
+    public void listen() {
         while (true) {
             try {
                 InputStream is = socket.getInputStream();
@@ -89,6 +86,9 @@ public class P2P {
                 int len = is.read(b);
 
                 Object obj = SerializeUtil.deserialize(b);
+                if (obj == null)
+                    continue;
+                System.out.println(obj.getClass());
                 if (obj instanceof Block) {
                     // 别的节点挖出了新节点
                     LogUtil.Log(Level.INFO, "Receive a block");
@@ -99,7 +99,7 @@ public class P2P {
                     BlockChain.receiveBlockChainHandle((List<Block>) obj);
                 } else if (obj instanceof Transaction) {
                     BlockTransactions.addTransaction((Transaction) obj);
-                } else {
+                } else if (obj instanceof String && "give me the blockchain".equals(obj)) {
                     // 别的节点的整条链请求
                     // 实际上是能拿到发过来的ip的, 用socket就好, 不用多播, 但用ip是否意味着不是匿名了?
                     // 这样做会稍微加重网络负担, 之后再改进

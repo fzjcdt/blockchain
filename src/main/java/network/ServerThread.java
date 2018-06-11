@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class ServerThread extends Thread {
 
@@ -29,10 +30,17 @@ public class ServerThread extends Thread {
                     list.remove(socket);
                     break;
                 }
-                for (Socket socket : list) {
-                    if (this.socket != socket) {
-                        os = socket.getOutputStream();
-                        os.write(b);
+
+                Iterator<Socket> it = list.iterator();
+                while (it.hasNext()) {
+                    Socket s = it.next();
+                    try {
+                        if (!s.equals(this.socket)) {
+                            os = socket.getOutputStream();
+                            os.write(b);
+                        }
+                    } catch (Exception e) {
+                        list.remove(s);
                     }
                 }
             }
