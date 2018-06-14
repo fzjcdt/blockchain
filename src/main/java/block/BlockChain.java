@@ -26,7 +26,7 @@ public class BlockChain {
     }
 
     public static synchronized void receiveBlockChainHandle(List<Block> bc) {
-        if (bc.size() >= blockChain.size() && isValidBlockChain(bc)) {
+        if (bc.size() > blockChain.size() && isValidBlockChain(bc)) {
             LogUtil.Log(Level.INFO, "Find a valid and longer blockchain from other node");
             blockChain = bc;
             BlockTransactions.clear();
