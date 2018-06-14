@@ -35,7 +35,7 @@ public class P2PLocalArea {
 
     public static P2PLocalArea getInstance() {
         if (instance == null) {
-            synchronized (P2PLocalArea.class) {
+            synchronized (P2P.class) {
                 if (instance == null) {
                     instance = new P2PLocalArea();
                     LogUtil.Log(Level.INFO, "Init P2P...");

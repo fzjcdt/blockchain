@@ -2,6 +2,7 @@ package controller;
 
 import block.Block;
 import block.BlockChain;
+import forum.ForumView;
 import log.LogUtil;
 import view.MainView;
 
@@ -20,12 +21,20 @@ public class MainController {
             MainView.updateBlockChain();
             LogUtil.Log(Level.INFO, "Controller: notify update blockchain");
         }
+
+        if (ForumView.mainFrame != null) {
+            ForumView.updateBlockChain();
+        }
     }
 
     public static void notifyAddBlock(Block block) {
         if (MainView.mainFrame != null) {
             MainView.addTableRow(block);
             LogUtil.Log(Level.INFO, "Controller: notify add block");
+        }
+
+        if (ForumView.mainFrame != null) {
+            ForumView.addBlock(block);
         }
     }
 

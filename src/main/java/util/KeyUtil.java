@@ -5,6 +5,7 @@ import wallet.Wallet;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Security;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -13,6 +14,7 @@ public class KeyUtil {
 
     public static PublicKey getPublicKey(String key) throws Exception {
         byte[] keyBytes;
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         keyBytes = Base64.getDecoder().decode(key);
         X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
@@ -23,6 +25,7 @@ public class KeyUtil {
 
     public static PrivateKey getPrivateKey(String key) throws Exception {
         byte[] keyBytes;
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
         keyBytes = Base64.getDecoder().decode(key);
         PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory keyFactory = KeyFactory.getInstance("ECDSA", "BC");
