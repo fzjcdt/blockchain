@@ -7,7 +7,7 @@ A project for blockchain learning
  ![界面](https://github.com/fzjcdt/blockchain/raw/master/screenshots/web_homepage.PNG)
 
 #### 网页端区块链
- ![区块链](https://github.com/fzjcdt/blockchain/raw/master/screenshots/web_blickchain.PNG)
+ ![区块链](https://github.com/fzjcdt/blockchain/raw/master/screenshots/web_blockchain.PNG)
 
 #### 网页端区块
  ![区块](https://github.com/fzjcdt/blockchain/raw/master/screenshots/web_block.PNG)
