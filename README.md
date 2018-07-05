@@ -1,5 +1,5 @@
 # blockchain
-A project for blockchain learning
+Code is Law
 
 ### 截图
 
