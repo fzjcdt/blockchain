@@ -1,5 +1,5 @@
 # blockchain
-Code is Law
+**I can't see the future of the blockchain.** Now all blockchain applications are fake blockchain technology, which is actually not decentralized at all, and it is not modifiable. The blockchain is the emperor's new clothes, but no one is willing to tell the truth in the front of profits.
 
 ### 截图
 
